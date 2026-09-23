@@ -1,6 +1,5 @@
 'use client'
 
-import { supabaseBrowser } from '@/lib/supabase/client'
 import { Eye, EyeOff, Gamepad2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
@@ -30,10 +29,10 @@ export function Login({ onLogin, onSignup }: LoginProps) {
     event.preventDefault()
     setError('')
     setIsSubmitting(true)
-    const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({ email, password })
+    const result = await signIn('credentials', { email, password, redirect: false })
     setIsSubmitting(false)
 
-    if (signInError) {
+    if (!result?.ok) {
       setError('Invalid email or password.')
       return
     }

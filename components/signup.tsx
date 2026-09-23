@@ -39,7 +39,12 @@ export function Signup({ onSignup, onLogin }: SignupProps) {
     }
 
     if (data.session) {
-      onSignup()
+      const result = await signIn('credentials', { email, password, redirect: false })
+      if (result?.ok) {
+        onSignup()
+      } else {
+        setError('Account created, but automatic login failed. Please log in.')
+      }
     } else {
       setError('Check your email to confirm your account before logging in.')
     }
