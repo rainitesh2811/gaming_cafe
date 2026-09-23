@@ -43,6 +43,10 @@ a { color: inherit; text-decoration: none; }
 .menu-popover .menu-button:hover { color: var(--text); }
 .menu-popover .logout-button { justify-content: space-between; margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--pink); }
 .menu-popover .logout-button span { font-size: 17px; }
+.notification-wrap { position: relative; }
+.notification-popover { position: absolute; z-index: 6; top: 48px; right: 0; width: 220px; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: #171b2d; box-shadow: 0 15px 40px #0008; }
+.notification-popover strong { display: block; margin-bottom: 7px; color: var(--cyan); font-size: 12px; }
+.notification-popover p { margin: 0; color: #c4c8d8; font-size: 12px; line-height: 1.5; }
 .profile-section { display: grid; gap: 12px; }
 .back-button { width: fit-content; padding: 0; border: 0; color: var(--muted); background: transparent; font-size: 11px; }
 .back-button:hover { color: var(--text); }

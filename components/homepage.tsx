@@ -42,6 +42,9 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
   const [locationRequest, setLocationRequest] = useState(0)
   const [locationLabel, setLocationLabel] = useState('Locating...')
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notificationsLoading, setNotificationsLoading] = useState(false)
+  const [notificationMessage, setNotificationMessage] = useState('')
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -102,8 +105,27 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
     setPasswordSaved(true)
   }
 
+  async function handleNotificationsClick() {
+    const nextOpen = !notificationsOpen
+    setNotificationsOpen(nextOpen)
+    if (!nextOpen) return
+
+    setNotificationsLoading(true)
+    try {
+      const response = await fetch('/api/notifications')
+      if (!response.ok) throw new Error('Unable to load notifications')
+      const result = await response.json() as { unreadCount: number }
+      setHasUnreadNotifications(result.unreadCount > 0)
+      setNotificationMessage(result.unreadCount > 0 ? `You have ${result.unreadCount} new notification${result.unreadCount === 1 ? '' : 's'}.` : 'No new notifications.')
+    } catch {
+      setNotificationMessage('Notifications are temporarily unavailable.')
+    } finally {
+      setNotificationsLoading(false)
+    }
+  }
+
   return <main className="home-shell">
-    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => { setMenuOpen(!menuOpen); setProfileOpen(false) }}><Menu size={22} /></button><button className="location" type="button" onClick={() => setLocationRequest((request) => request + 1)}><MapPin size={16} /><span><small>YOUR LOCATION</small>{locationLabel}</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} />{hasUnreadNotifications && <i />}</button></div>{menuOpen && <div className="menu-popover">{profileOpen ? <section className="profile-section"><button className="back-button" type="button" onClick={() => setProfileOpen(false)}>← Menu</button><strong>Profile</strong>{isGoogleUser ? <><p className="profile-note">Signed in with Google. Create a password to also log in with your email.</p><form className="profile-form" onSubmit={handlePasswordSubmit}><label>Create password<input type="password" minLength={8} value={password} onChange={(event) => { setPassword(event.target.value); setPasswordSaved(false) }} placeholder="At least 8 characters" required /></label><button className="profile-save" type="submit">{passwordSaved ? 'Password saved' : 'Create password'}</button></form></> : <p className="profile-note">You are signed in with your account password.</p>}</section> : <><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a><button className="menu-button" type="button" onClick={() => setProfileOpen(true)}><UserRound size={15} /> Profile</button><button className="menu-button logout-button" type="button" onClick={onLogout}>Log out <span>→</span></button></>}</div>}</header>
+    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => { setMenuOpen(!menuOpen); setProfileOpen(false); setNotificationsOpen(false) }}><Menu size={22} /></button><button className="location" type="button" onClick={() => setLocationRequest((request) => request + 1)}><MapPin size={16} /><span><small>YOUR LOCATION</small>{locationLabel}</span><ChevronDown size={15} /></button><div className="top-actions"><div className="notification-wrap"><button className="icon-button notification" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={handleNotificationsClick}><Bell size={19} />{hasUnreadNotifications && <i />}</button>{notificationsOpen && <div className="notification-popover" role="status"><strong>Notifications</strong><p>{notificationsLoading ? 'Checking for new notifications...' : notificationMessage}</p></div>}</div></div>{menuOpen && <div className="menu-popover">{profileOpen ? <section className="profile-section"><button className="back-button" type="button" onClick={() => setProfileOpen(false)}>← Menu</button><strong>Profile</strong>{isGoogleUser ? <><p className="profile-note">Signed in with Google. Create a password to also log in with your email.</p><form className="profile-form" onSubmit={handlePasswordSubmit}><label>Create password<input type="password" minLength={8} value={password} onChange={(event) => { setPassword(event.target.value); setPasswordSaved(false) }} placeholder="At least 8 characters" required /></label><button className="profile-save" type="submit">{passwordSaved ? 'Password saved' : 'Create password'}</button></form></> : <p className="profile-note">You are signed in with your account password.</p>}</section> : <><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a><button className="menu-button" type="button" onClick={() => setProfileOpen(true)}><UserRound size={15} /> Profile</button><button className="menu-button logout-button" type="button" onClick={onLogout}>Log out <span>→</span></button></>}</div>}</header>
     <div className="home-content">
       <div className="greeting"><div><p className="eyebrow">TUESDAY, SEP 23</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
       <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div>{eventsLoading ? <article className="event-card event-status">Loading upcoming events...</article> : eventsError ? <article className="event-card event-status">Events are temporarily unavailable.</article> : events.length > 0 ? <EventCard event={events[0]} /> : <article className="event-card event-status">No upcoming events yet.</article>}</section>
