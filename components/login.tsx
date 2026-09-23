@@ -14,7 +14,7 @@ function Brand() {
 }
 
 type LoginProps = {
-  onLogin: () => void
+  onLogin: (provider?: 'google') => void
   onSignup: () => void
 }
 
@@ -23,7 +23,7 @@ export function Login({ onLogin, onSignup }: LoginProps) {
 
   async function handleGoogleSignIn() {
     const result = await signIn('google', { callbackUrl: '/', redirect: false })
-    if (result?.ok) onLogin()
+    if (result?.ok) onLogin('google')
   }
 
   return (

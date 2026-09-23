@@ -8,13 +8,14 @@ import { useState } from 'react'
 
 export default function Page() {
   const [screen, setScreen] = useState<'login' | 'signup' | 'home'>('login')
+  const [isGoogleUser, setIsGoogleUser] = useState(false)
 
   async function handleLogout() {
     await signOut({ redirect: false })
     setScreen('login')
   }
 
-  if (screen === 'home') return <Homepage onLogout={handleLogout} />
+  if (screen === 'home') return <Homepage onLogout={handleLogout} isGoogleUser={isGoogleUser} />
   if (screen === 'signup') return <Signup onSignup={() => setScreen('home')} onLogin={() => setScreen('login')} />
-  return <Login onLogin={() => setScreen('home')} onSignup={() => setScreen('signup')} />
+  return <Login onLogin={(provider) => { setIsGoogleUser(provider === 'google'); setScreen('home') }} onSignup={() => setScreen('signup')} />
 }

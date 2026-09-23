@@ -38,3 +38,18 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 390px) { .home-content { padding-left: 17px; padding-right: 17px; }.topbar { padding-left: 17px; padding-right: 17px; }.greeting h1 { font-size: 26px; }.event-content h3 { font-size: 21px; } }
 
 @layer base { * { outline-color: #6df6f055; } }
+
+.menu-popover .menu-button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0; border: 0; color: #c4c8d8; background: transparent; font-size: 12px; text-align: left; }
+.menu-popover .menu-button:hover { color: var(--text); }
+.menu-popover .logout-button { justify-content: space-between; margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--pink); }
+.menu-popover .logout-button span { font-size: 17px; }
+.profile-section { display: grid; gap: 12px; }
+.back-button { width: fit-content; padding: 0; border: 0; color: var(--muted); background: transparent; font-size: 11px; }
+.back-button:hover { color: var(--text); }
+.profile-section strong { color: var(--cyan); }
+.profile-note { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.profile-form { display: grid; gap: 10px; }
+.profile-form label { display: grid; gap: 7px; color: #d2d5e3; font-size: 11px; font-weight: 700; }
+.profile-form input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 7px; outline: none; background: #0d101d; color: var(--text); font-size: 11px; }
+.profile-form input:focus { border-color: var(--purple); }
+.profile-save { padding: 9px 10px; border: 0; border-radius: 7px; color: #080a13; background: var(--cyan); font-size: 11px; font-weight: 800; }

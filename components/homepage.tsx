@@ -1,7 +1,7 @@
 'use client'
 
 import { Bell, ChevronDown, Home, Map, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
-import { useState } from 'react'
+import { type FormEvent, useState } from 'react'
 
 const cafes = [
   { name: 'Pixel Forge Arena', rating: '4.8', distance: '1.2 km away', image: '/cafe-neon-grid.png', specs: ['RTX 4080', '180Hz'], accent: 'cyan' },
@@ -26,19 +26,28 @@ function CafeCard({ cafe }: { cafe: typeof cafes[number] }) {
 
 type HomepageProps = {
   onLogout: () => void | Promise<void>
+  isGoogleUser: boolean
 }
 
-export function Homepage({ onLogout }: HomepageProps) {
+export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [password, setPassword] = useState('')
+  const [passwordSaved, setPasswordSaved] = useState(false)
+
+  function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!password) return
+    setPasswordSaved(true)
+  }
 
   return <main className="home-shell">
-    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button><button className="location"><span>⌖</span><span><small>YOUR LOCATION</small>Downtown Branch</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} /><i /></button><div className="profile-menu"><button className="avatar" aria-label="Profile" aria-expanded={profileOpen} onClick={() => setProfileOpen(!profileOpen)}><UserRound size={18} /></button>{profileOpen && <div className="profile-popover"><strong>Profile</strong><button type="button" onClick={onLogout}>Log out <span>→</span></button></div>}</div></div>{menuOpen && <div className="menu-popover"><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a></div>}</header>
+    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => { setMenuOpen(!menuOpen); setProfileOpen(false) }}><Menu size={22} /></button><button className="location"><span>⌖</span><span><small>YOUR LOCATION</small>Downtown Branch</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} /><i /></button></div>{menuOpen && <div className="menu-popover">{profileOpen ? <section className="profile-section"><button className="back-button" type="button" onClick={() => setProfileOpen(false)}>← Menu</button><strong>Profile</strong>{isGoogleUser ? <><p className="profile-note">Signed in with Google. Create a password to also log in with your email.</p><form className="profile-form" onSubmit={handlePasswordSubmit}><label>Create password<input type="password" minLength={8} value={password} onChange={(event) => { setPassword(event.target.value); setPasswordSaved(false) }} placeholder="At least 8 characters" required /></label><button className="profile-save" type="submit">{passwordSaved ? 'Password saved' : 'Create password'}</button></form></> : <p className="profile-note">You are signed in with your account password.</p>}</section> : <><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a><button className="menu-button" type="button" onClick={() => setProfileOpen(true)}><UserRound size={15} /> Profile</button><button className="menu-button logout-button" type="button" onClick={onLogout}>Log out <span>→</span></button></>}</div>}</header>
     <div className="home-content">
       <div className="greeting"><div><p className="eyebrow">TUESDAY, SEP 23</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
       <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div><EventCard /></section>
       <section className="cafes-section" id="cafes"><div className="section-heading"><div><p className="eyebrow">PLAY NEARBY</p><h2>Gaming cafes</h2></div><button className="view-toggle" aria-label="Search cafes"><Search size={17} /></button></div><div className="cafe-list">{cafes.map((cafe) => <CafeCard cafe={cafe} key={cafe.name} />)}</div></section>
     </div>
-    <nav className="bottom-nav" aria-label="Main navigation"><a className="active" href="#home"><Home size={20} /><span>Home</span></a><a href="#search"><Search size={20} /><span>Explore</span></a><a href="#bookings"><Ticket size={20} /><span>Bookings</span></a><a href="#profile"><UserRound size={20} /><span>Profile</span></a></nav>
+    <nav className="bottom-nav" aria-label="Main navigation"><a className="active" href="#home"><Home size={20} /><span>Home</span></a><a href="#search"><Search size={20} /><span>Explore</span></a><a href="#bookings"><Ticket size={20} /><span>Bookings</span></a></nav>
   </main>
 }
