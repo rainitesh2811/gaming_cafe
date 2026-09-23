@@ -66,7 +66,7 @@ export function Signup({ onSignup, onLogin }: SignupProps) {
 
       <section className="auth-panel">
         <div className="auth-header">
-          <p className="mobile-brand"><Brand /></p>
+          <div className="mobile-brand"><Brand /></div>
           <p className="eyebrow">WELCOME, PLAYER</p>
           <h2>Join the squad.</h2>
           <p className="muted">Create an account and start your adventure.</p>

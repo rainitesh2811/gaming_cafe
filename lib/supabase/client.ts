@@ -8,5 +8,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabaseBrowser = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'levelup-supabase-auth',
+    storage: typeof window === 'undefined' ? undefined : window.localStorage,
+  },
 })

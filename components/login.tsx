@@ -62,7 +62,7 @@ export function Login({ onLogin, onSignup }: LoginProps) {
 
       <section className="auth-panel">
         <div className="auth-header">
-          <p className="mobile-brand"><Brand /></p>
+          <div className="mobile-brand"><Brand /></div>
           <p className="eyebrow">WELCOME BACK, PLAYER</p>
           <h2>Ready to play?</h2>
           <p className="muted">Log in to book your next gaming session.</p>

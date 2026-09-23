@@ -4,7 +4,7 @@ import { Homepage } from '@/components/homepage'
 import { Login } from '@/components/login'
 import { Signup } from '@/components/signup'
 import { supabaseBrowser } from '@/lib/supabase/client'
-import { signOut } from 'next-auth/react'
+import { getSession, signOut } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 
 export default function Page() {
@@ -14,18 +14,22 @@ export default function Page() {
 
   useEffect(() => {
     let active = true
+    let initialized = false
 
     const { data: authListener } = supabaseBrowser.auth.onAuthStateChange((_event, session) => {
-      if (!active) return
+      if (!active || !initialized) return
       setIsGoogleUser(false)
       setScreen(session ? 'home' : 'login')
       setCheckingSession(false)
     })
 
-    supabaseBrowser.auth.getSession().then(({ data }) => {
+    Promise.all([supabaseBrowser.auth.getSession(), getSession()]).then(([supabaseResult, nextAuthSession]) => {
       if (!active) return
-      setIsGoogleUser(false)
-      setScreen(data.session ? 'home' : 'login')
+      const hasSupabaseSession = Boolean(supabaseResult.data.session)
+      const hasNextAuthSession = Boolean(nextAuthSession)
+      setIsGoogleUser(!hasSupabaseSession && hasNextAuthSession)
+      setScreen(hasSupabaseSession || hasNextAuthSession ? 'home' : 'login')
+      initialized = true
       setCheckingSession(false)
     })
 
