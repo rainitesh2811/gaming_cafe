@@ -31,19 +31,25 @@ export function Login({ onLogin, onSignup }: LoginProps) {
     setError('')
     setIsSubmitting(true)
     const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({ email, password })
-    setIsSubmitting(false)
 
     if (signInError) {
+      setIsSubmitting(false)
       setError('Invalid email or password.')
       return
     }
 
+    const result = await signIn('credentials', { email, password, redirect: false })
+    if (result?.ok) {
+      window.location.assign(result.url ?? '/')
+      return
+    }
+
+    setIsSubmitting(false)
     onLogin()
   }
 
   async function handleGoogleSignIn() {
-    const result = await signIn('google', { callbackUrl: '/', redirect: false })
-    if (result?.ok) onLogin('google')
+    await signIn('google', { callbackUrl: '/' })
   }
 
   return (
