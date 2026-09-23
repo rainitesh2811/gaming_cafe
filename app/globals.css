@@ -50,7 +50,7 @@ a { color: inherit; text-decoration: none; }
 .profile-section { display: grid; gap: 12px; }
 .event-carousel { display: flex; gap: 12px; overflow-x: auto; margin-right: -22px; padding: 0 22px 8px 0; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .event-carousel::-webkit-scrollbar { display: none; }
-.event-carousel .event-card { flex: 0 0 88%; height: 210px; scroll-snap-align: start; }
+.event-carousel .event-card { flex: 0 0 min(62%, 220px); height: 290px; scroll-snap-align: start; }
 .event-carousel .event-status { display: flex; align-items: center; justify-content: center; padding: 20px; color: #c4c8d8; text-align: center; }
 .event-carousel .event-status-secondary { background: #15192a; color: #747c96; }
 .bookings-shell { min-height: 100vh; max-width: 740px; margin: auto; padding-bottom: 88px; background: var(--bg); }
