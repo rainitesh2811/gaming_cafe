@@ -19,7 +19,11 @@ const browserStorage = {
   },
 }
 
-export const supabaseBrowser = createClient(supabaseUrl, supabaseAnonKey, {
+const globalForSupabase = globalThis as typeof globalThis & {
+  levelupSupabaseBrowser?: ReturnType<typeof createClient>
+}
+
+export const supabaseBrowser = globalForSupabase.levelupSupabaseBrowser ?? createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -28,3 +32,5 @@ export const supabaseBrowser = createClient(supabaseUrl, supabaseAnonKey, {
     storage: browserStorage,
   },
 })
+
+globalForSupabase.levelupSupabaseBrowser = supabaseBrowser
