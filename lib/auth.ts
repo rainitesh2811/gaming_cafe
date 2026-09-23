@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
 
 export const { handlers, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   providers: [
     Google,
