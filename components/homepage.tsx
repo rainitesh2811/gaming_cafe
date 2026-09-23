@@ -1,18 +1,20 @@
 'use client'
 
 import { Bell, ChevronDown, Home, Map, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
+import type { Event } from '@/lib/supabase/types'
 
 const cafes = [
   { name: 'Pixel Forge Arena', rating: '4.8', distance: '1.2 km away', image: '/cafe-neon-grid.png', specs: ['RTX 4080', '180Hz'], accent: 'cyan' },
   { name: 'Nexus Gaming Lounge', rating: '4.6', distance: '2.4 km away', image: '/tournament-arena.png', specs: ['RTX 4070 Ti', '165Hz'], accent: 'purple' },
 ]
 
-function EventCard() {
+function EventCard({ event }: { event: Event }) {
+  const eventDate = new Date(event.event_date)
   return <article className="event-card">
     <img src="/tournament-arena.png" alt="Esports tournament arena" />
     <div className="event-overlay" />
-    <div className="event-content"><p className="eyebrow">LIVE EVENT · THIS SATURDAY</p><h3>Midnight Mayhem</h3><p className="event-meta">Valorant · 32 teams · 10:00 PM</p><div className="event-bottom"><strong>02<span>d</span> 14<span>h</span> 32<span>m</span></strong><button>Book Seat <span>→</span></button></div></div>
+    <div className="event-content"><p className="eyebrow">UPCOMING EVENT</p><h3>{event.title}</h3><p className="event-meta">{eventDate.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })} · {eventDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</p><div className="event-bottom"><strong>{event.ticket_price === 0 ? 'Free' : `$${Number(event.ticket_price).toFixed(2)}`}<span> / seat</span></strong><button>Book Seat <span>→</span></button></div></div>
     <div className="carousel-dots"><i className="active" /><i /><i /></div>
   </article>
 }
@@ -34,6 +36,20 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
   const [profileOpen, setProfileOpen] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordSaved, setPasswordSaved] = useState(false)
+  const [events, setEvents] = useState<Event[]>([])
+  const [eventsLoading, setEventsLoading] = useState(true)
+  const [eventsError, setEventsError] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/events')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Unable to load events')
+        const result = await response.json() as { events: Event[] }
+        setEvents(result.events)
+      })
+      .catch(() => setEventsError(true))
+      .finally(() => setEventsLoading(false))
+  }, [])
 
   function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -45,7 +61,7 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
     <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => { setMenuOpen(!menuOpen); setProfileOpen(false) }}><Menu size={22} /></button><button className="location"><span>⌖</span><span><small>YOUR LOCATION</small>Downtown Branch</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} /><i /></button></div>{menuOpen && <div className="menu-popover">{profileOpen ? <section className="profile-section"><button className="back-button" type="button" onClick={() => setProfileOpen(false)}>← Menu</button><strong>Profile</strong>{isGoogleUser ? <><p className="profile-note">Signed in with Google. Create a password to also log in with your email.</p><form className="profile-form" onSubmit={handlePasswordSubmit}><label>Create password<input type="password" minLength={8} value={password} onChange={(event) => { setPassword(event.target.value); setPasswordSaved(false) }} placeholder="At least 8 characters" required /></label><button className="profile-save" type="submit">{passwordSaved ? 'Password saved' : 'Create password'}</button></form></> : <p className="profile-note">You are signed in with your account password.</p>}</section> : <><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a><button className="menu-button" type="button" onClick={() => setProfileOpen(true)}><UserRound size={15} /> Profile</button><button className="menu-button logout-button" type="button" onClick={onLogout}>Log out <span>→</span></button></>}</div>}</header>
     <div className="home-content">
       <div className="greeting"><div><p className="eyebrow">TUESDAY, SEP 23</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
-      <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div><EventCard /></section>
+      <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div>{eventsLoading ? <article className="event-card event-status">Loading upcoming events...</article> : eventsError ? <article className="event-card event-status">Events are temporarily unavailable.</article> : events.length > 0 ? <EventCard event={events[0]} /> : <article className="event-card event-status">No upcoming events yet.</article>}</section>
       <section className="cafes-section" id="cafes"><div className="section-heading"><div><p className="eyebrow">PLAY NEARBY</p><h2>Gaming cafes</h2></div><button className="view-toggle" aria-label="Search cafes"><Search size={17} /></button></div><div className="cafe-list">{cafes.map((cafe) => <CafeCard cafe={cafe} key={cafe.name} />)}</div></section>
     </div>
     <nav className="bottom-nav" aria-label="Main navigation"><a className="active" href="#home"><Home size={20} /><span>Home</span></a><a href="#search"><Search size={20} /><span>Explore</span></a><a href="#bookings"><Ticket size={20} /><span>Bookings</span></a></nav>

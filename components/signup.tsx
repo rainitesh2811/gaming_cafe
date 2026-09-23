@@ -1,5 +1,6 @@
 'use client'
 
+import { supabaseBrowser } from '@/lib/supabase/client'
 import { Eye, EyeOff, Gamepad2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
@@ -20,6 +21,29 @@ type SignupProps = {
 
 export function Signup({ onSignup, onLogin }: SignupProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleEmailSignUp(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+    const { data, error: signUpError } = await supabaseBrowser.auth.signUp({ email, password })
+    setIsSubmitting(false)
+
+    if (signUpError) {
+      setError(signUpError.message)
+      return
+    }
+
+    if (data.session) {
+      onSignup()
+    } else {
+      setError('Check your email to confirm your account before logging in.')
+    }
+  }
 
   async function handleGoogleSignIn() {
     const result = await signIn('google', { callbackUrl: '/', redirect: false })
@@ -51,10 +75,11 @@ export function Signup({ onSignup, onLogin }: SignupProps) {
           <button role="tab" aria-selected="false" onClick={onLogin}>Log In</button>
           <button className="active" role="tab" aria-selected="true">Sign Up</button>
         </div>
-        <form className="auth-form" onSubmit={(event) => { event.preventDefault(); onSignup() }}>
-          <label>Email or Username<input type="text" placeholder="you@example.com" required /></label>
-          <label>Password<div className="password-input"><input type={showPassword ? 'text' : 'password'} placeholder="Create a password" required /><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
-          <button className="primary-button" type="submit">Create Account<span>→</span></button>
+        <form className="auth-form" onSubmit={handleEmailSignUp}>
+          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required /></label>
+          <label>Password<div className="password-input"><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Create a password" minLength={8} required /><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
+          {error && <p className="auth-error" role="alert">{error}</p>}
+          <button className="primary-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create Account'}<span>→</span></button>
         </form>
         <div className="divider"><span>or continue with</span></div>
         <div className="social-row">
