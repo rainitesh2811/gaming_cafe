@@ -45,6 +45,11 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notificationsLoading, setNotificationsLoading] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState('')
+  const [todayLabel, setTodayLabel] = useState('')
+
+  useEffect(() => {
+    setTodayLabel(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase())
+  }, [])
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -127,10 +132,10 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
   return <main className="home-shell">
     <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => { setMenuOpen(!menuOpen); setProfileOpen(false); setNotificationsOpen(false) }}><Menu size={22} /></button><button className="location" type="button" onClick={() => setLocationRequest((request) => request + 1)}><MapPin size={16} /><span><small>YOUR LOCATION</small>{locationLabel}</span><ChevronDown size={15} /></button><div className="top-actions"><div className="notification-wrap"><button className="icon-button notification" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={handleNotificationsClick}><Bell size={19} />{hasUnreadNotifications && <i />}</button>{notificationsOpen && <div className="notification-popover" role="status"><strong>Notifications</strong><p>{notificationsLoading ? 'Checking for new notifications...' : notificationMessage}</p></div>}</div></div>{menuOpen && <div className="menu-popover">{profileOpen ? <section className="profile-section"><button className="back-button" type="button" onClick={() => setProfileOpen(false)}>← Menu</button><strong>Profile</strong>{isGoogleUser ? <><p className="profile-note">Signed in with Google. Create a password to also log in with your email.</p><form className="profile-form" onSubmit={handlePasswordSubmit}><label>Create password<input type="password" minLength={8} value={password} onChange={(event) => { setPassword(event.target.value); setPasswordSaved(false) }} placeholder="At least 8 characters" required /></label><button className="profile-save" type="submit">{passwordSaved ? 'Password saved' : 'Create password'}</button></form></> : <p className="profile-note">You are signed in with your account password.</p>}</section> : <><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a><button className="menu-button" type="button" onClick={() => setProfileOpen(true)}><UserRound size={15} /> Profile</button><button className="menu-button logout-button" type="button" onClick={onLogout}>Log out <span>→</span></button></>}</div>}</header>
     <div className="home-content">
-      <div className="greeting"><div><p className="eyebrow">TUESDAY, SEP 23</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
+      <div className="greeting"><div><p className="eyebrow">{todayLabel}</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
       <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div>{eventsLoading ? <article className="event-card event-status">Loading upcoming events...</article> : eventsError ? <article className="event-card event-status">Events are temporarily unavailable.</article> : events.length > 0 ? <EventCard event={events[0]} /> : <article className="event-card event-status">No upcoming events yet.</article>}</section>
       <section className="cafes-section" id="cafes"><div className="section-heading"><div><p className="eyebrow">PLAY NEARBY</p><h2>Gaming cafes</h2></div><button className="view-toggle" aria-label="Search cafes"><Search size={17} /></button></div><div className="cafe-list">{cafes.map((cafe) => <CafeCard cafe={cafe} key={cafe.name} />)}</div></section>
     </div>
-    <nav className="bottom-nav" aria-label="Main navigation"><a className="active" href="#home"><Home size={20} /><span>Home</span></a><a href="#search"><Search size={20} /><span>Explore</span></a><a href="#bookings"><Ticket size={20} /><span>Bookings</span></a></nav>
+    <nav className="bottom-nav" aria-label="Main navigation"><a className="active" href="#home"><Home size={20} /><span>Home</span></a><a href="#search"><Search size={20} /><span>Explore</span></a><a href="/bookings"><Ticket size={20} /><span>Bookings</span></a></nav>
   </main>
 }
