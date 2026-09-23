@@ -1,6 +1,5 @@
 'use client'
 
-import { supabaseBrowser } from '@/lib/supabase/client'
 import type { Event } from '@/lib/supabase/types'
 import { Bell, ChevronDown, Home, Map, MapPin, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
@@ -55,7 +54,10 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
         if (!response.ok) throw new Error('Unable to resolve location')
         const result = await response.json() as { city?: string; locality?: string; principalSubdivision?: string; countryName?: string; postcode?: string }
         const city = result.city || result.locality || result.principalSubdivision || 'Unknown'
-        const { error: locationError } = await supabaseBrowser.from('locations').insert({
+          const saveResponse = await fetch('/api/locations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
           address: result.locality || city,
           city,
           country: result.countryName || 'Unknown',
@@ -63,7 +65,8 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
           latitude: coords.latitude,
           longitude: coords.longitude,
         } as never)
-        if (locationError) throw locationError
+          })
+          if (!saveResponse.ok) throw new Error('Unable to save location')
         setLocationLabel(city)
       } catch {
         setLocationLabel(`${coords.latitude.toFixed(2)}, ${coords.longitude.toFixed(2)}`)
