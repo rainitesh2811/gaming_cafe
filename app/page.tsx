@@ -12,10 +12,11 @@ export default function Page() {
 
   async function handleLogout() {
     await signOut({ redirect: false })
+    setIsGoogleUser(false)
     setScreen('login')
   }
 
   if (screen === 'home') return <Homepage onLogout={handleLogout} isGoogleUser={isGoogleUser} />
-  if (screen === 'signup') return <Signup onSignup={() => setScreen('home')} onLogin={() => setScreen('login')} />
+  if (screen === 'signup') return <Signup onSignup={() => { setIsGoogleUser(false); setScreen('home') }} onLogin={() => setScreen('login')} />
   return <Login onLogin={(provider) => { setIsGoogleUser(provider === 'google'); setScreen('home') }} onSignup={() => setScreen('signup')} />
 }
