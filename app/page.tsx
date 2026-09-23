@@ -23,15 +23,28 @@ export default function Page() {
       setCheckingSession(false)
     })
 
-    Promise.all([supabaseBrowser.auth.getSession(), getSession()]).then(([supabaseResult, nextAuthSession]) => {
-      if (!active) return
-      const hasSupabaseSession = Boolean(supabaseResult.data.session)
-      const hasNextAuthSession = Boolean(nextAuthSession)
-      setIsGoogleUser(!hasSupabaseSession && hasNextAuthSession)
-      setScreen(hasSupabaseSession || hasNextAuthSession ? 'home' : 'login')
-      initialized = true
-      setCheckingSession(false)
-    })
+    async function restoreSession() {
+      try {
+        const [{ data: supabaseResult }, nextAuthSession] = await Promise.all([
+          supabaseBrowser.auth.getSession(),
+          getSession(),
+        ])
+        if (!active) return
+
+        const hasSupabaseSession = Boolean(supabaseResult.session)
+        const hasNextAuthSession = Boolean(nextAuthSession)
+        setIsGoogleUser(!hasSupabaseSession && hasNextAuthSession)
+        setScreen(hasSupabaseSession || hasNextAuthSession ? 'home' : 'login')
+        initialized = true
+      } catch {
+        if (active) setScreen('login')
+      } finally {
+        initialized = true
+        if (active) setCheckingSession(false)
+      }
+    }
+
+    restoreSession()
 
     return () => {
       active = false
