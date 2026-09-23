@@ -1,5 +1,6 @@
 'use client'
 
+import { supabaseBrowser } from '@/lib/supabase/client'
 import type { Event } from '@/lib/supabase/types'
 import { Bell, ChevronDown, Home, Map, MapPin, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
@@ -52,9 +53,18 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
       try {
         const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`)
         if (!response.ok) throw new Error('Unable to resolve location')
-        const result = await response.json() as { city?: string; locality?: string; principalSubdivision?: string }
-        const locality = result.city || result.locality || result.principalSubdivision
-        setLocationLabel(locality || `${coords.latitude.toFixed(2)}, ${coords.longitude.toFixed(2)}`)
+        const result = await response.json() as { city?: string; locality?: string; principalSubdivision?: string; countryName?: string; postcode?: string }
+        const city = result.city || result.locality || result.principalSubdivision || 'Unknown'
+        const { error: locationError } = await supabaseBrowser.from('locations').insert({
+          address: result.locality || city,
+          city,
+          country: result.countryName || 'Unknown',
+          postal_code: result.postcode || null,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        })
+        if (locationError) throw locationError
+        setLocationLabel(city)
       } catch {
         setLocationLabel(`${coords.latitude.toFixed(2)}, ${coords.longitude.toFixed(2)}`)
       }
