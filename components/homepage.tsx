@@ -1,7 +1,7 @@
 'use client'
 
+import { Bell, ChevronDown, Home, Map, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
 import { useState } from 'react'
-import { Bell, ChevronDown, Gamepad2, Home, Map, Menu, Search, Star, Ticket, UserRound } from 'lucide-react'
 
 const cafes = [
   { name: 'Pixel Forge Arena', rating: '4.8', distance: '1.2 km away', image: '/cafe-neon-grid.png', specs: ['RTX 4080', '180Hz'], accent: 'cyan' },
@@ -24,11 +24,16 @@ function CafeCard({ cafe }: { cafe: typeof cafes[number] }) {
   </article>
 }
 
-export function Homepage() {
+type HomepageProps = {
+  onLogout: () => void | Promise<void>
+}
+
+export function Homepage({ onLogout }: HomepageProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
 
   return <main className="home-shell">
-    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button><button className="location"><span>⌖</span><span><small>YOUR LOCATION</small>Downtown Branch</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} /><i /></button><button className="avatar" aria-label="Profile"><UserRound size={18} /></button></div>{menuOpen && <div className="menu-popover"><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a></div>}</header>
+    <header className="topbar"><button className="icon-button" aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button><button className="location"><span>⌖</span><span><small>YOUR LOCATION</small>Downtown Branch</span><ChevronDown size={15} /></button><div className="top-actions"><button className="icon-button notification" aria-label="Notifications"><Bell size={19} /><i /></button><div className="profile-menu"><button className="avatar" aria-label="Profile" aria-expanded={profileOpen} onClick={() => setProfileOpen(!profileOpen)}><UserRound size={18} /></button>{profileOpen && <div className="profile-popover"><strong>Profile</strong><button type="button" onClick={onLogout}>Log out <span>→</span></button></div>}</div></div>{menuOpen && <div className="menu-popover"><strong>Menu</strong><a href="#events">Events</a><a href="#cafes">Saved cafes</a><a href="#help">Help center</a></div>}</header>
     <div className="home-content">
       <div className="greeting"><div><p className="eyebrow">TUESDAY, SEP 23</p><h1>Find your <span>next play.</span></h1></div><button className="filter-button" aria-label="Filter cafes"><Map size={17} /></button></div>
       <section className="events-section" id="events"><div className="section-heading"><div><p className="eyebrow">DON&apos;T MISS OUT</p><h2>Upcoming events</h2></div><a href="#all-events">View all <span>→</span></a></div><EventCard /></section>
