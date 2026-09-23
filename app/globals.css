@@ -48,6 +48,11 @@ a { color: inherit; text-decoration: none; }
 .notification-popover strong { display: block; margin-bottom: 7px; color: var(--cyan); font-size: 12px; }
 .notification-popover p { margin: 0; color: #c4c8d8; font-size: 12px; line-height: 1.5; }
 .profile-section { display: grid; gap: 12px; }
+.event-carousel { display: flex; gap: 12px; overflow-x: auto; margin-right: -22px; padding: 0 22px 8px 0; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.event-carousel::-webkit-scrollbar { display: none; }
+.event-carousel .event-card { flex: 0 0 88%; height: 210px; scroll-snap-align: start; }
+.event-carousel .event-status { display: flex; align-items: center; justify-content: center; padding: 20px; color: #c4c8d8; text-align: center; }
+.event-carousel .event-status-secondary { background: #15192a; color: #747c96; }
 .bookings-shell { min-height: 100vh; max-width: 740px; margin: auto; padding-bottom: 88px; background: var(--bg); }
 .bookings-header { display: flex; align-items: center; gap: 16px; padding: 24px 22px 12px; }.bookings-header h1 { margin: 0; font-size: 28px; }.bookings-header-icon { margin-left: auto; color: var(--cyan); }
 .bookings-content { padding: 28px 22px; }.bookings-status { color: var(--muted); font-size: 13px; text-align: center; padding: 48px 0; }
