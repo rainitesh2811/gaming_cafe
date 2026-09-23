@@ -7,7 +7,10 @@ export const { handlers, auth } = NextAuth({
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   providers: [
-    Google,
+    Google({
+      clientId: (process.env.AUTH_GOOGLE_ID ?? process.env.NEXTAUTH_GOOGLE_ID)!,
+      clientSecret: (process.env.AUTH_GOOGLE_SECRET ?? process.env.NEXTAUTH_GOOGLE_SECRET)!,
+    }),
     Credentials({
       name: 'Email and password',
       credentials: {
