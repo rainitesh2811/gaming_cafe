@@ -62,7 +62,7 @@ export function Homepage({ onLogout, isGoogleUser }: HomepageProps) {
           postal_code: result.postcode || null,
           latitude: coords.latitude,
           longitude: coords.longitude,
-        })
+        } as never)
         if (locationError) throw locationError
         setLocationLabel(city)
       } catch {
