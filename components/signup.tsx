@@ -41,7 +41,7 @@ export function Signup({ onSignup, onLogin }: SignupProps) {
     if (data.session) {
       const result = await signIn('credentials', { email, password, redirect: false })
       if (result?.ok) {
-        onSignup()
+        window.location.assign(result.url ?? '/')
       } else {
         setError('Account created, but automatic login failed. Please log in.')
       }

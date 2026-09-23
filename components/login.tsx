@@ -37,7 +37,7 @@ export function Login({ onLogin, onSignup }: LoginProps) {
       return
     }
 
-    await onLogin()
+    window.location.assign(result.url ?? '/')
   }
 
   async function handleGoogleSignIn() {
