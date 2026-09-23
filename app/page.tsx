@@ -15,15 +15,24 @@ export default function Page() {
   useEffect(() => {
     let active = true
 
-    supabaseBrowser.auth.getSession().then(({ data }) => {
-      if (active && data.session) {
-        setIsGoogleUser(false)
-        setScreen('home')
-      }
-      if (active) setCheckingSession(false)
+    const { data: authListener } = supabaseBrowser.auth.onAuthStateChange((_event, session) => {
+      if (!active) return
+      setIsGoogleUser(false)
+      setScreen(session ? 'home' : 'login')
+      setCheckingSession(false)
     })
 
-    return () => { active = false }
+    supabaseBrowser.auth.getSession().then(({ data }) => {
+      if (!active) return
+      setIsGoogleUser(false)
+      setScreen(data.session ? 'home' : 'login')
+      setCheckingSession(false)
+    })
+
+    return () => {
+      active = false
+      authListener.subscription.unsubscribe()
+    }
   }, [])
 
   async function handleLogout() {
