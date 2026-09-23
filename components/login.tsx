@@ -1,5 +1,6 @@
 'use client'
 
+import { supabaseBrowser } from '@/lib/supabase/client'
 import { Eye, EyeOff, Gamepad2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
@@ -29,15 +30,15 @@ export function Login({ onLogin, onSignup }: LoginProps) {
     event.preventDefault()
     setError('')
     setIsSubmitting(true)
-    const result = await signIn('credentials', { email, password, redirect: false })
+    const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({ email, password })
     setIsSubmitting(false)
 
-    if (!result?.ok) {
+    if (signInError) {
       setError('Invalid email or password.')
       return
     }
 
-    window.location.assign(result.url ?? '/')
+    onLogin()
   }
 
   async function handleGoogleSignIn() {
